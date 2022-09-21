@@ -1,4 +1,5 @@
 import pygame
+from base import Window
 
 HEIGHT, WIDTH = 600, 1200
 WHITE = (210, 210, 210)
@@ -10,26 +11,21 @@ class Objeto:
         self.pf = pf
         self.v = v
         self.diametro = 20
-        self.movimento = []
-
         self.ESCALA = (WIDTH - 50) / (pf - x)       # 10px == 1 metro
 
+        self.movimento = [(x * self.ESCALA + self.diametro , HEIGHT - 1.1 * self.diametro)]
+
     def draw(self, win):
-        updated_points = []
-        for point in self.movimento:
-            x, y = point
-            updated_points.append((x, y))
+        x, y = self.movimento[-1]
 
         if len(self.movimento) > 2:
-            pygame.draw.lines(win, BLACK, False, updated_points, 2)
+            pygame.draw.lines(win, BLACK, False, self.movimento, 2)
 
         pygame.draw.circle(win, BLACK, (x, y), self.diametro)
 
     def deslocamento(self, t):
-        vk = self.v
-        v = vk / 3.6
-        x = self.x
-        px = x + v * t
+        v = self.v / 3.6
+        px = self.x + v * t
         return px, v
 
     def update_position(self, t):
@@ -48,28 +44,27 @@ def main():
         x = float(input('Qual a posição inicial do objeto? (metros) '))
         pf = float(input('Qual a posição final do objeto? (metros) '))
         v = float(input('Qual a velocidade do objeto? (km/h) '))
-        objeto = Objeto(x, pf, v)
     except:
         run = False
 
-    pygame.init()
-    WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption('Movimento Uniforme')
-    pygame.font.SysFont("comicsans", 16)
+    WIN = Window((WIDTH, HEIGHT), "Movimento Uniforme", font=("comicsans", 16))
+    WIN.start()
+
+    boll = Objeto(x, pf, v)
+    if boll:
+        WIN.append_component(boll)
 
     while run:
         clock.tick(20)
-        WIN.fill(WHITE)
         t += 1/20
+
+        WIN.refresh_screen()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
-        objeto.update_position(t)
-        objeto.draw(WIN)
-
-        pygame.display.update()
+        boll.update_position(t)
 
     pygame.quit()
 
