@@ -1,5 +1,5 @@
 # created by virtualenv automatically
-bin
-lib
+include/
+bin/
+lib/
 pyvenv.cfg
-include
