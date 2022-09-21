@@ -38,13 +38,14 @@ class Game(Window):
 
         run = 1
 
-        input_box = InputBox(100, 100, 140, 32)
+        input_box = InputBox(250, 250, 140, 32)
         self.append_component(input_box)
 
         while run:
             clock.tick(20)
             self.refresh_screen()
             for event in pygame.event.get():
+                input_box.enable_event(event)
                 if event.type == pygame.QUIT:
                     run = 0
 

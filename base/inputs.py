@@ -18,7 +18,7 @@ class InputBox:
             else:
                 self.active = False
             self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
-        if event.type == pg.KEYDOWN:
+        if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
                     print(self.text)
@@ -28,7 +28,7 @@ class InputBox:
                 else:
                     self.text += event.unicode
                 # Re-render the text.
-                self.txt_surface = FONT.render(self.text, True, self.color)
+                self.txt_surface = pygame.font.Font(None, 32).render(self.text, True, self.color)
 
     def update(self):
         width = max(200, self.txt_surface.get_width()+10)
