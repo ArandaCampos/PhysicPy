@@ -2,8 +2,7 @@ import pygame
 from base import Window
 
 HEIGHT, WIDTH = 600, 1200
-WHITE = (210, 210, 210)
-BLACK = (0, 0, 0, 0.8)
+WHITE, BLACK = (210, 210, 210), (0, 0, 0, 0.8)
 
 class Objeto:
     def __init__ (self, x, pf, v):
@@ -35,38 +34,42 @@ class Objeto:
             print("%.2f | %.2f | %.2f" %(x, t, v))
             self.movimento.append((x * self.ESCALA + diametro , HEIGHT - 1.1 * diametro))
 
-def main():
-    run = True
-    t = 0
-    clock = pygame.time.Clock()
+class Game(Window):
+    def __init__(self, size, txt, font):
+        super().__init__(size, txt, font=font)
 
-    try:
-        x = float(input('Qual a posição inicial do objeto? (metros) '))
-        pf = float(input('Qual a posição final do objeto? (metros) '))
-        v = float(input('Qual a velocidade do objeto? (km/h) '))
-    except:
-        run = False
+    def play(self):
+        clock = pygame.time.Clock()
+        run = 1
+        t = 0
 
-    WIN = Window((WIDTH, HEIGHT), "Movimento Uniforme", font=("comicsans", 16))
-    WIN.start()
+        try:
+            x = float(input('Qual a posição inicial do objeto? (metros) '))
+            pf = float(input('Qual a posição final do objeto? (metros) '))
+            v = float(input('Qual a velocidade do objeto? (km/h) '))
+        except:
+            run = False
 
-    boll = Objeto(x, pf, v)
-    if boll:
-        WIN.append_component(boll)
+        self.start()
 
-    while run:
-        clock.tick(20)
-        t += 1/20
+        boll = Objeto(x, pf, v)
+        if boll:
+            self.append_component(boll)
 
-        WIN.refresh_screen()
+        while run:
+            clock.tick(20)
+            t += 1/20
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
+            self.refresh_screen()
 
-        boll.update_position(t)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
 
-    pygame.quit()
+            boll.update_position(t)
+
+        pygame.quit()
 
 if __name__ == '__main__':
-    main()
+    game = Game((WIDTH, HEIGHT), "Movimento Uniforme", ("comicsans", 16))
+    game.play()
