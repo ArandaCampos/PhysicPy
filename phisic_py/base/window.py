@@ -12,7 +12,7 @@ class Window():
         self.title = title
         self.screen = None
         self.bg = bg
-        self.font = pygame.font.Font(*font)
+        self.font = pygame.font.SysFont(*font)
         self.components = []
 
     def start(self):
