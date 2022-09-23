@@ -1,3 +1,8 @@
+# -------------------------------------
+#   Author: Renan Campos
+#   Github: github.com/ArandaCampos
+#--------------------------------------
+
 import pygame
 from base import Window
 
@@ -5,10 +10,11 @@ HEIGHT, WIDTH = 600, 1200
 WHITE, BLACK = (210, 210, 210), (0, 0, 0, 0.8)
 
 class Objeto:
-    def __init__ (self, x, pf, v):
+    def __init__ (self, x: float, pf: float, v: float):
         self.x = x
         self.pf = pf
         self.v = v
+        self.t = 0
         self.diametro = 20
         self.ESCALA = (WIDTH - 50) / (pf - x)       # 10px == 1 metro
 
@@ -22,16 +28,17 @@ class Objeto:
 
         pygame.draw.circle(win, BLACK, (x, y), self.diametro)
 
-    def deslocamento(self, t):
+    def deslocamento(self):
         v = self.v / 3.6
-        px = self.x + v * t
+        px = self.x + v * self.t
         return px, v
 
-    def update_position(self, t):
-        x, v = self.deslocamento(t)
+    def update_position(self):
+        self.t += 1/20
+        x, v = self.deslocamento()
         pf, diametro = self.pf, self.diametro
         if x <= pf:
-            print("%.2f | %.2f | %.2f" %(x, t, v))
+            print("%.2f | %.2f | %.2f" %(x, self.t, v))
             self.movimento.append((x * self.ESCALA + diametro , HEIGHT - 1.1 * diametro))
 
 class Game(Window):
@@ -40,15 +47,26 @@ class Game(Window):
 
     def play(self):
         clock = pygame.time.Clock()
-        run = 1
-        t = 0
+        run = True
+        x = pf = v = None
 
-        try:
-            x = float(input('Qual a posição inicial do objeto? (metros) '))
-            pf = float(input('Qual a posição final do objeto? (metros) '))
-            v = float(input('Qual a velocidade do objeto? (km/h) '))
-        except:
-            run = False
+        while x == None:
+            try:
+                x = float(input('Qual a posição inicial do objeto? (metros) '))
+            except ValueError:
+                print("Valor incompatível!")
+
+        while pf == None or x >= pf:
+            try:
+                pf = float(input('Qual a posição final do objeto? (metros) '))
+            except ValueError:
+                print("Valor incompatível!")
+
+        while v == None or v <= 0:
+            try:
+                v = float(input('Qual a velocidade do objeto? (km/h) '))
+            except ValueError:
+                print("Valor incompatível!")
 
         self.start()
 
@@ -58,7 +76,6 @@ class Game(Window):
 
         while run:
             clock.tick(20)
-            t += 1/20
 
             self.refresh_screen()
 
@@ -66,7 +83,7 @@ class Game(Window):
                 if event.type == pygame.QUIT:
                     run = False
 
-            boll.update_position(t)
+            boll.update_position()
 
         pygame.quit()
 
