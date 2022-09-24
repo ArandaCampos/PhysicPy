@@ -22,7 +22,7 @@ class Objeto:
         self.m = m
         self.L = L
         self.diameter = 20
-        self.w = self.frequencia_angular()
+        self.w = self.linear_frequency()
         self.SCALE = HEIGHT / L * 0.8
 
         self.movements = []
@@ -45,7 +45,7 @@ class Objeto:
         x, y = pos
         return (x * self.SCALE + WIDTH / 2, y * self.SCALE)
 
-    def frequencia_angular(self):
+    def linear_frequency(self):
         w = math.sqrt(self.g / self.L)
         return w
 
