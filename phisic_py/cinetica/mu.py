@@ -20,6 +20,8 @@ class Objeto:
 
         self.movimento = [(x * self.ESCALA + self.diametro , HEIGHT - 1.1 * self.diametro)]
 
+        self.play = False
+
     def draw(self, win):
         x, y = self.movimento[-1]
 
@@ -33,12 +35,16 @@ class Objeto:
         px = self.x + v * self.t
         return px, v
 
+    def handle_play(self):
+        self.play = not self.play
+
     def update_position(self):
-        self.t += 1/20
-        x, v = self.deslocamento()
-        if x <= self.pf:
-            print("%.2f | %.2f | %.2f" %(x, self.t, v))
-            self.movimento.append((x * self.ESCALA + self.diametro , HEIGHT - 1.1 * self.diametro))
+        if self.play:
+            self.t += 1/20
+            x, v = self.deslocamento()
+            if x <= self.pf:
+                #print("%.2f | %.2f | %.2f" %(x, self.t, v))
+                self.movimento.append((x * self.ESCALA + self.diametro , HEIGHT - 1.1 * self.diametro))
 
 class Game(Window):
     def __init__(self, size, txt, font):
@@ -70,6 +76,7 @@ class Game(Window):
         self.start()
 
         boll = Objeto(x, pf, v)
+        #boll.handle_play()
         if boll:
             self.append_component(boll)
 
@@ -81,6 +88,9 @@ class Game(Window):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        boll.handle_play()
 
             boll.update_position()
 
