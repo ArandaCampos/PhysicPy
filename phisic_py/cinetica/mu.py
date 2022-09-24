@@ -1,6 +1,8 @@
 # -------------------------------------
 #   Author: Renan Campos
 #   Github: github.com/ArandaCampos
+#
+#   Movimento Uniforme (MU)
 #--------------------------------------
 
 import pygame
@@ -10,47 +12,66 @@ HEIGHT, WIDTH = 600, 1200
 WHITE, BLACK = (210, 210, 210), (0, 0, 0, 0.8)
 
 class Objeto:
-    def __init__ (self, x: float, pf: float, v: float):
+    def __init__ (self, x: float, y: float, pf: float, v: float):
         self.x = x
+        self.y = y
         self.pf = pf
         self.v = v
-        self.t = 0
-        self.diametro = 20
-        self.ESCALA = (WIDTH - 50) / (pf - x)       # 10px == 1 metro
+        self.diameter = 20
+        self.SCALEX = (WIDTH - 50 - self.diameter) / (pf - x)       # 10px == 1 metro
+        self.SCALEY = (HEIGHT - 50 - self.diameter) / 4       # 10px == 1 metro
 
-        self.movimento = [(x * self.ESCALA + self.diametro , HEIGHT - 1.1 * self.diametro)]
-
-        self.play = False
+        self.movements = []
+        self.position = 0
 
     def draw(self, win):
-        x, y = self.movimento[-1]
+        x, y = self.movements[self.position]
 
-        if len(self.movimento) > 2:
-            pygame.draw.lines(win, BLACK, False, self.movimento, 2)
+        if len(self.movements) > 2:
+            pygame.draw.line(win, BLACK, self.transform(self.movements[0]), self.transform(self.movements[self.position]), 2)
 
-        pygame.draw.circle(win, BLACK, (x, y), self.diametro)
+        pygame.draw.circle(win, BLACK, self.transform(self.movements[self.position]), self.diameter)
 
-    def deslocamento(self):
-        v = self.v / 3.6
-        px = self.x + v * self.t
-        return px, v
+    def transform(self, pos: (float, float)):
+        x, y = pos
+        return (x * self.SCALEX + self.diameter + 15 , y * self.SCALEY - 1.1 * self.diameter + 25)
 
-    def handle_play(self):
-        self.play = not self.play
+    def movement(self, interval):
+        x = self.x
+        time = interval
+        while x < self.pf:
+            v = self.v / 3.6
+            x = self.x + v * time
+            time += interval
+            self.movements.append((x, self.y))
 
-    def update_position(self):
-        if self.play:
-            self.t += 1/20
-            x, v = self.deslocamento()
-            if x <= self.pf:
-                #print("%.2f | %.2f | %.2f" %(x, self.t, v))
-                self.movimento.append((x * self.ESCALA + self.diametro , HEIGHT - 1.1 * self.diametro))
+    def update_position(self, frame):
+        if frame < len(self.movements) and frame >= 0:
+            self.position = frame
 
 class Game(Window):
     def __init__(self, size, txt, font):
         super().__init__(size, txt, font=font)
 
-    def play(self):
+        self.play = True
+        self.velocity = 1/20
+        self.speed = 1
+        self.frame = 0
+
+    def to_back(self):
+        self.speed -= 1
+        if not self.speed:
+            self.speed = -1
+
+    def forward(self):
+        self.speed += 1
+        if not self.speed:
+            self.speed = 1
+
+    def handle_play(self):
+        self.play = not self.play
+
+    def run(self):
         clock = pygame.time.Clock()
         run = True
         x = pf = v = None
@@ -75,10 +96,9 @@ class Game(Window):
 
         self.start()
 
-        boll = Objeto(x, pf, v)
-        #boll.handle_play()
-        if boll:
-            self.append_component(boll)
+        boll = Objeto(x, 4, pf, v)
+        boll.movement(self.velocity)
+        self.append_component(boll)
 
         while run:
             clock.tick(20)
@@ -90,12 +110,18 @@ class Game(Window):
                     run = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        boll.handle_play()
+                        self.handle_play()
+                    if event.key == pygame.K_LEFT:
+                        self.to_back()
+                    if event.key == pygame.K_RIGHT:
+                        self.forward()
 
-            boll.update_position()
+            if self.play:
+                self.frame += self.speed
+                boll.update_position(self.frame)
 
         pygame.quit()
 
 if __name__ == '__main__':
     game = Game((WIDTH, HEIGHT), "Movimento Uniforme", ("comicsans", 16))
-    game.play()
+    game.run()
