@@ -53,23 +53,9 @@ class Game(Window):
     def __init__(self, size, txt, font):
         super().__init__(size, txt, font=font)
 
-        self.play = True
         self.velocity = 1/20
         self.speed = 1
         self.frame = 0
-
-    def to_back(self):
-        self.speed -= 1
-        if not self.speed:
-            self.speed = -1
-
-    def forward(self):
-        self.speed += 1
-        if not self.speed:
-            self.speed = 1
-
-    def handle_play(self):
-        self.play = not self.play
 
     def run(self):
         clock = pygame.time.Clock()
