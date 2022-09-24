@@ -18,7 +18,7 @@ class Window():
 
         self.play = True
 
-    def start(self):
+    def init(self):
         self.screen = pygame.display.set_mode(self.size)
         pygame.display.set_caption(self.title)
 

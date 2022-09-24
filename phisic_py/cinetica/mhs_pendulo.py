@@ -35,7 +35,7 @@ class Objeto:
 
         if len(self.movimento) > 2:
             pygame.draw.lines(win, BLACK, False, updated_points, 2)
-        
+
         pygame.draw.circle(win, BLACK, (self.x, self.y), self.diametro)
         pygame.draw.lines(win, BLACK, False, [(WIDTH / 2 , 0) , (self.x, self.y)], 2)
 
@@ -82,7 +82,7 @@ class Game(Window):
             except ValueError:
                 print("Valor incompatível!")
 
-        self.start()
+        self.init()
 
         obj = Objeto(theta, m, L)
         self.append_component(obj)
@@ -97,7 +97,7 @@ class Game(Window):
 
             obj.update_position()
 
-    pygame.quit()
+        self.exit()
 
 if __name__ == '__main__':
     game = Game((WIDTH, HEIGHT), "Movimento Harmônico Simples", ("comicsans", 16))

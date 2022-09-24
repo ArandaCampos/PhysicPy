@@ -80,7 +80,7 @@ class Game(Window):
             except ValueError:
                 print("Valor incompatível!")
 
-        self.start()
+        self.init()
 
         boll = Objeto(x, 4, pf, v)
         boll.movement(self.velocity)
@@ -106,7 +106,7 @@ class Game(Window):
                 self.frame += self.speed
                 boll.update_position(self.frame)
 
-        pygame.quit()
+        self.exit()
 
 if __name__ == '__main__':
     game = Game((WIDTH, HEIGHT), "Movimento Uniforme", ("comicsans", 16))
