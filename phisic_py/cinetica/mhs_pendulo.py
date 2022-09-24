@@ -21,47 +21,56 @@ class Objeto:
         self.y = 0
         self.m = m
         self.L = L
-        self.t = 0
-        self.diametro = 20
-        self.movimento = []
+        self.diameter = 20
         self.w = self.frequencia_angular()
-        self.ESCALA = HEIGHT / L * 0.8
+        self.SCALE = HEIGHT / L * 0.8
+
+        self.movements = []
+        self.position = 0
 
     def draw(self, win):
-        updated_points = []
-        for point in self.movimento:
-            x, y = point
-            updated_points.append((x, y))
+        x, y = self.movements[self.position]
 
-        if len(self.movimento) > 2:
-            pygame.draw.lines(win, BLACK, False, updated_points, 2)
+        if self.position > 2:
+            points = []
+            for movement in self.movements[0: self.position]:
+                points.append(self.transform(movement))
 
-        pygame.draw.circle(win, BLACK, (self.x, self.y), self.diametro)
-        pygame.draw.lines(win, BLACK, False, [(WIDTH / 2 , 0) , (self.x, self.y)], 2)
+            pygame.draw.lines(win, BLACK, False, points, 2)
 
-    def transformacaoLinear(self):
-        self.x = self.x * self.ESCALA + WIDTH /2
-        self.y = self.y * self.ESCALA
+        pygame.draw.circle(win, BLACK, self.transform(self.movements[self.position]), self.diameter)
+        pygame.draw.lines(win, BLACK, False, [(WIDTH / 2 , 0) , self.transform(self.movements[self.position])], 2)
+
+    def transform(self, pos):
+        x, y = pos
+        return (x * self.SCALE + WIDTH / 2, y * self.SCALE)
 
     def frequencia_angular(self):
         w = math.sqrt(self.g / self.L)
         return w
 
-    def deslocamento(self):
-        self.x = self.w * self.A * math.cos(self.w*self.t)
-        self.y = math.sqrt(math.pow(self.L, 2) - math.pow(self.x, 2))
+    def movement(self, interval):
+        x = self.x
+        time = interval
+        while time < 20:
+            x = self.w * self.A * math.cos(self.w * time)
+            y = math.sqrt(math.pow(self.L, 2) - math.pow(x, 2))
+            time += interval
+            self.movements.append((x, y))
 
-    def update_position(self):
-        self.t += 1/20
-        self.deslocamento()
-        self.transformacaoLinear()
-        self.movimento.append((self.x, self.y))
+    def update_position(self, frame):
+        if frame < len(self.movements) and frame >= 0:
+            self.position = frame
 
 class Game(Window):
     def __init__(self, size, txt, font):
         super().__init__(size, txt)
 
-    def play(self):
+        self.velocity = 1/20
+        self.speed = 1
+        self.frame = 0
+
+    def run(self):
         clock = pygame.time.Clock()
         run = True
         theta = m = L = 0
@@ -85,6 +94,7 @@ class Game(Window):
         self.init()
 
         obj = Objeto(theta, m, L)
+        obj.movement(self.velocity)
         self.append_component(obj)
 
         while run:
@@ -94,11 +104,20 @@ class Game(Window):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.handle_play()
+                    if event.key == pygame.K_LEFT:
+                        self.to_back()
+                    if event.key == pygame.K_RIGHT:
+                        self.forward()
 
-            obj.update_position()
+            if self.play:
+                self.frame += self.speed
+                obj.update_position(self.frame)
 
         self.exit()
 
 if __name__ == '__main__':
     game = Game((WIDTH, HEIGHT), "Movimento Harmônico Simples", ("comicsans", 16))
-    game.play()
+    game.run()

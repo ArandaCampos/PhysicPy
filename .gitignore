@@ -4,3 +4,6 @@ lib
 pyvenv.cfg
 include
 __pycache__
+phific_py/__pycache__
+phific_py/base/__pycache__
+phific_py/cinetica/__pycache__
