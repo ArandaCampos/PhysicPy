@@ -1,91 +1,104 @@
+#---------------------------------------
+#   Author: Renan Campos
+#   Github: github.com/ArandaCampos
+#   Movimento Harmônica Simples (MHS)
+#----------------------------------------
 import math
 import pygame
-pygame.init()
-
-theta = -1
-while not ((theta >= 0) and (theta <= 10)):
-    theta = float(input('Qual o angulo inicial em graus? (menor que 10) '))
-m = float(input('Qual a massa do objeto? '))        # Por mero parâmetro experimental
-L = float(input('Qual o comprimento da linha? (em m) '))
+from base import Window
 
 WIDTH, HEIGHT = 1200, 600
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Movimento Harmônico Simples")
-
 WHITE = (210, 210, 210)
 BLACK = (0, 0, 0, .8)
 
-#FONT = pygame.font.SysFont("comicsans", 16)
-
 class Objeto:
-	g = 9.807 		       	                # Aceleração da gravidade (m/s^2)
-	ESCALA = HEIGHT / L * 0.8	        # L == Altura da tela
+    g = 9.807 		       	                # Aceleração da gravidade (m/s^2)
 
-	def __init__(self, angulo, m, L):
-		self.angulo = theta
-		self.A = L * math.sin(math.radians(angulo))
-		self.x = 0
-		self.y = 0
-		self.m = m
-		self.L = L
-		self.diametro = 20
-		self.movimento = []
-		self.w = self.frequencia_angular()
+    def __init__(self, angulo, m, L):
+        self.angulo = angulo
+        self.A = L * math.sin(math.radians(angulo))
+        self.x = 0
+        self.y = 0
+        self.m = m
+        self.L = L
+        self.t = 0
+        self.diametro = 20
+        self.movimento = []
+        self.w = self.frequencia_angular()
+        self.ESCALA = HEIGHT / L * 0.8
 
-	def draw(self, win):
-		updated_points = []
-		for point in self.movimento:
-			x, y = point
-			x = x
-			y = y
-			updated_points.append((x, y))
+    def draw(self, win):
+        updated_points = []
+        for point in self.movimento:
+            x, y = point
+            updated_points.append((x, y))
 
-		if len(self.movimento) > 2:
-			pygame.draw.lines(win, BLACK, False, updated_points, 2)
+        if len(self.movimento) > 2:
+            pygame.draw.lines(win, BLACK, False, updated_points, 2)
+        
+        pygame.draw.circle(win, BLACK, (self.x, self.y), self.diametro)
+        pygame.draw.lines(win, BLACK, False, [(WIDTH / 2 , 0) , (self.x, self.y)], 2)
 
-		pygame.draw.circle(win, BLACK, (x, y), self.diametro)
-		pygame.draw.lines(win, BLACK, False, [(WIDTH / 2 , 0) , (x, y)], 2)
+    def transformacaoLinear(self):
+        self.x = self.x * self.ESCALA + WIDTH /2
+        self.y = self.y * self.ESCALA
 
-	def transformacaoLinear(self, x, y):
-		x += WIDTH / 2
-		return x, y
+    def frequencia_angular(self):
+        w = math.sqrt(self.g / self.L)
+        return w
 
-	def frequencia_angular(self):
-		L, g = self.L, self.g
-		w = math.sqrt(g / L)
-		return w
+    def deslocamento(self):
+        self.x = self.w * self.A * math.cos(self.w*self.t)
+        self.y = math.sqrt(math.pow(self.L, 2) - math.pow(self.x, 2))
 
-	def deslocamento(self, t):
-		w, A, L = self.w, self.A, self.L
-		x = w * A * math.cos(w*t)
-		y = math.sqrt(math.pow(L, 2) - math.pow(x, 2))
-		return x, y
+    def update_position(self):
+        self.t += 1/20
+        self.deslocamento()
+        self.transformacaoLinear()
+        self.movimento.append((self.x, self.y))
 
-	def update_position(self, t):
-		self.x, self.y = self.deslocamento(t)
-		x, y = self.transformacaoLinear(self.x * self.ESCALA, self.y * self.ESCALA)
-		self.movimento.append((x, y))
+class Game(Window):
+    def __init__(self, size, txt, font):
+        super().__init__(size, txt)
 
-def main(theta, m, L):
-	run = True
-	clock = pygame.time.Clock()
-	t = 0
-	objeto = Objeto(theta, m, L)
+    def play(self):
+        clock = pygame.time.Clock()
+        run = True
+        theta = m = L = 0
 
-	while run:
-		clock.tick(20)
-		WIN.fill(WHITE)
+        while theta <= 0 or theta > 10:
+            try:
+                theta = float(input('Qual o angulo inicial em graus? (menor que 10) '))
+            except ValueError:
+                print("Valor incompatível!")
+        while m <= 0:
+            try:
+                m = float(input('Qual a massa do objeto? '))
+            except ValueError:
+                print("Valor incompatível!")
+        while L <= 0:
+            try:
+                L = float(input('Qual o comprimento da linha? (em m) '))
+            except ValueError:
+                print("Valor incompatível!")
 
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				run = False
+        self.start()
 
-		objeto.update_position(t)
-		objeto.draw(WIN)
+        obj = Objeto(theta, m, L)
+        self.append_component(obj)
 
-		pygame.display.update()
+        while run:
+            clock.tick(20)
+            self.refresh_screen()
 
-		t += 1/20
-	pygame.quit()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
 
-main(theta, m, L)
+            obj.update_position()
+
+    pygame.quit()
+
+if __name__ == '__main__':
+    game = Game((WIDTH, HEIGHT), "Movimento Harmônico Simples", ("comicsans", 16))
+    game.play()

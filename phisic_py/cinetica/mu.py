@@ -4,7 +4,7 @@
 #--------------------------------------
 
 import pygame
-from base import Window
+from base import Window, InputBox
 
 HEIGHT, WIDTH = 600, 1200
 WHITE, BLACK = (210, 210, 210), (0, 0, 0, 0.8)
@@ -36,10 +36,9 @@ class Objeto:
     def update_position(self):
         self.t += 1/20
         x, v = self.deslocamento()
-        pf, diametro = self.pf, self.diametro
-        if x <= pf:
+        if x <= self.pf:
             print("%.2f | %.2f | %.2f" %(x, self.t, v))
-            self.movimento.append((x * self.ESCALA + diametro , HEIGHT - 1.1 * diametro))
+            self.movimento.append((x * self.ESCALA + self.diametro , HEIGHT - 1.1 * self.diametro))
 
 class Game(Window):
     def __init__(self, size, txt, font):
