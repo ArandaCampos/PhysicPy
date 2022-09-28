@@ -5,21 +5,26 @@
 #   Movimento Uniforme (MU)
 #--------------------------------------
 
+import os
 import pygame
 from base import Window, InputBox
 
 HEIGHT, WIDTH = 600, 1200
 WHITE, BLACK = (210, 210, 210), (0, 0, 0, 0.8)
+FONT = ('comicsans', 16)
+ABS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+IMG_PATH = os.path.join(ABS_PATH, 'sprites')
 
 class Objeto:
-    def __init__ (self, x: float, y: float, pf: float, v: float):
+    def __init__ (self, x: float, y: float, pf: float, v: float, img: str):
         self.x = x
         self.y = y
         self.pf = pf
         self.v = v
+        self.img = self.set_sprite(img)
         self.diameter = 20
         self.SCALEX = (WIDTH - 50 - self.diameter) / (pf - x)       # 10px == 1 metro
-        self.SCALEY = (HEIGHT - 50 - self.diameter) / 4       # 10px == 1 metro
+        self.SCALEY = (HEIGHT - 50 - self.diameter) / 4
 
         self.movements = []
         self.position = 0
@@ -31,10 +36,11 @@ class Objeto:
             pygame.draw.line(win, BLACK, self.transform(self.movements[0]), self.transform(self.movements[self.position]), 2)
 
         pygame.draw.circle(win, BLACK, self.transform(self.movements[self.position]), self.diameter)
+        #win.blit(self.img, self.transform(self.movements[self.position]))
 
     def transform(self, pos: (float, float)):
         x, y = pos
-        return (x * self.SCALEX + self.diameter + 15 , y * self.SCALEY - 1.1 * self.diameter + 25)
+        return (x * self.SCALEX , y * self.SCALEY)
 
     def movement(self, interval):
         x = self.x
@@ -49,10 +55,13 @@ class Objeto:
         if frame < len(self.movements) and frame >= 0:
             self.position = frame
 
+    def set_sprite(self, name: str):
+        img = pygame.image.load(os.path.join(IMG_PATH, name)).convert_alpha()
+        return pygame.transform.scale(img, (45,50))
+
 class Game(Window):
     def __init__(self, size, txt, font):
         super().__init__(size, txt, font=font)
-
         self.velocity = 1/20
         self.speed = 1
         self.frame = 0
@@ -82,7 +91,7 @@ class Game(Window):
 
         self.init()
 
-        boll = Objeto(x, 4, pf, v)
+        boll = Objeto(x, 4, pf, v, 'boll.png')
         boll.movement(self.velocity)
         self.append_component(boll)
 
@@ -104,10 +113,11 @@ class Game(Window):
 
             if self.play:
                 self.frame += self.speed
-                boll.update_position(self.frame)
+
+            boll.update_position(self.frame)
 
         self.exit()
 
 if __name__ == '__main__':
-    game = Game((WIDTH, HEIGHT), "Movimento Uniforme", ("comicsans", 16))
+    game = Game((WIDTH, HEIGHT), "Movimento Uniforme", FONT)
     game.run()
