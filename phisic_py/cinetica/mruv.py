@@ -1,92 +1,121 @@
-from wsgiref.simple_server import WSGIRequestHandler
+#---------------------------------------------
+#   Author: Renan Campos
+#   Github: github.com/ArandaCampos
+#   Movimento Retilínio Uniformemente Variado (MRUV)
+#---------------------------------------------
+
 import pygame
 import math
-pygame.init()
-
-x = float(input('Qual posição inicial em metros? '))
-pf = float(input('Qual a posição final em metros '))
-velocidade = float(input('Qual a velocidade inicial (m/s): '))
-aceleracao = float(input('Qual a aceleracao, em m/s, do objeto? '))
+from base import Window
 
 WIDTH, HEIGHT = 1200, 600
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Movimento Retilíneo Uniformemente Variado")
-
-WHITE = (210, 210, 210)
-BLACK = (0, 0, 0, .8)
-
-#FONT = pygame.font.SysFont("comicsans", 16)
+WHITE, BLACK = (210, 210, 210), (0, 0, 0, .8)
 
 class Objeto:
-	g = -9.807 		       	# Aceleração da gravidade (m/s^2)
-	P0 = x
-	ESCALA = (WIDTH - 50) / (pf - x)				# 10px == 1 metro
+    g = -9.807 		       	# Aceleração da gravidade (m/s^2)
 
-	def __init__(self, x, velocidade, aceleracao, pf):
-		self.x = x													# Posição Vertical (m)
-		self.y = 2											# Posição Horizontal (m)
-		self.pf = pf
-		self.v = velocidade
-		self.a = aceleracao
-		self.diametro = 20
-		self.movimento = []
+    def __init__(self, x, velocidade, aceleracao, pf):
+        self.x = x													# Posição Vertical
+        self.y = HEIGHT / 2											# Posição Horizontal 
+        self.pf = pf
+        self.v = velocidade
+        self.a = aceleracao
+        self.diameter = 20
 
-	def draw(self, win):
-		updated_points = []
-		for point in self.movimento:
-			x, y = point
-			x = x
-			y = y
-			updated_points.append((x, y))
+        self.position = 0
+        self.movements = []
 
-		if len(self.movimento) > 2:
-			pygame.draw.lines(win, BLACK, False, updated_points, 2)
+        self.SCALE = (WIDTH - 50 - self.diameter) / (pf - x)
 
-		pygame.draw.circle(win, BLACK, (x, y), self.diametro)
+    def draw(self, win):
+        if self.position > 2:
+            pygame.draw.line(win, BLACK, self.transform(self.movements[0]), self.transform(self.movements[self.position]), 2)
 
-	def transformacaoLinear(self, x):
-		x -= self.P0
-		return x
+        pygame.draw.circle(win, BLACK, self.transform(self.movements[self.position]), self.diameter)
 
-	def velocidade(self, t):
-		a, v = self.a, self.v
-		V = v * t + (math.pow(t, 2) * a) / 2
-		return V
+    def transform(self, position):
+        x, y = position
+        x = x * self.SCALE + 25
+        return (x, y)
 
-	def deslocamento(self, t):
-		v = self.velocidade(t)
-		x = self.x
-		px = x + v
-		return px, v
+    def velocity(self, time):
+        a, v = self.a, self.v
+        V = v * time + (math.pow(time, 2) * a) / 2
+        return V
 
-	def update_position(self, t):
-		x, v = self.deslocamento(t)
-		y, pf = self.y, self.pf
-		if x <= pf:
-			print("%.2f | %.2f | %.2f" %(x, t, v))
-			x = self.transformacaoLinear(x)
-			self.movimento.append((x * self.ESCALA + 25 , HEIGHT - y * self.ESCALA - self.diametro))
+    def movement(self, interval):
+        px, pf = self.x, self.pf
+        time = 0
+        while px < pf:
+            v = self.velocity(time)
+            px += v
+            time += interval
+            self.movements.append((px, self.y))
 
-def main(x, velocidade, aceleracao, p0):
-	run = True
-	clock = pygame.time.Clock()
-	t = 0
-	objeto = Objeto(x, velocidade, aceleracao, pf)
+    def update_position(self, frame):
+        if frame < len(self.movements) and frame >= 0:
+            self.position = frame
 
-	while run:
-		clock.tick(20)
-		WIN.fill(WHITE)
-		t += 1/20
+class Game(Window):
+    def __init__(self, size, title, font):
+        super().__init__(size, title)
 
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				run = False
+        self.velocity = 1/20
+        self.speed = 1
+        self.frame = 0
 
-		objeto.update_position(t)
-		objeto.draw(WIN)
+    def run(self):
+        run = True
+        clock = pygame.time.Clock()
+        x = pf = velocidade = aceleracao = None
 
-		pygame.display.update()
+        while x == None:
+            try:
+                x = float(input('Qual posição inicial em metros? '))
+            except ValueError:
+                print("Valor incompatível")
+        while pf == None or pf <= x:
+            try:
+                pf = float(input('Qual a posição final em metros '))
+            except ValueError:
+                print("Valor incompatível")
+        while velocidade == None or velocidade <= 0:
+            try:
+                velocidade = float(input('Qual a velocidade inicial (m/s): '))
+            except ValueError:
+                print("Valor incompatível")
+        while aceleracao == None:
+            try:
+                aceleracao = float(input('Qual a aceleracao, em m/s, do objeto? '))
+            except ValueError:
+                print("Valor incompatível")
 
-	pygame.quit()
+        self.init()
+        obj = Objeto(x, velocidade, aceleracao, pf)
+        obj.movement(self.velocity)
+        self.append_component(obj)
 
-main(x, velocidade, aceleracao, pf)
+        while run:
+            clock.tick(20)
+            self.refresh_screen()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.handle_play()
+                    if event.key == pygame.K_LEFT:
+                        self.to_back()
+                    if event.key == pygame.K_RIGHT:
+                        self.forward()
+
+            if self.play:
+                self.frame += self.speed
+                obj.update_position(self.frame)
+
+        self.exit()
+
+if __name__ == "__main__":
+    game = Game((WIDTH, HEIGHT), "Movimento Retilíneo Uniformemente Variado", ("comicsans", 16))
+    game.run()
