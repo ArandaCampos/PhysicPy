@@ -16,7 +16,9 @@ class Window():
         self.font = font
         self.components = []
 
-    def start(self):
+        self.play = True
+
+    def init(self):
         self.screen = pygame.display.set_mode(self.size)
         pygame.display.set_caption(self.title)
 
@@ -34,6 +36,19 @@ class Window():
 
     def append_component(self, component):
         self.components.append(component)
+
+    def to_back(self):
+        self.speed -= 1
+        if not self.speed:
+            self.speed = -1
+
+    def forward(self):
+        self.speed += 1
+        if not self.speed:
+            self.speed = 1
+
+    def handle_play(self):
+        self.play = not self.play
 
     def exit(self):
         pygame.quit()
