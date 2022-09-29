@@ -12,6 +12,8 @@ class Window():
         self.title = title
         self.screen = None
         self.bg = bg
+        #self.img = self.set_sprite(img)
+        #self.img_pointer = self.set_sprite("pointer.png")
         #self.font = pygame.font.SysFont(*font)
         self.font = font
         self.components = []
@@ -31,7 +33,7 @@ class Window():
     def load_sprite(self, path: str, scale: (int, int) = None):
         sprite = pygame.image.load(os.path.join(diretorio_imagem, path)).convert_alpha()
         if scale:
-            sprite = pygame.transform.scale(sprite, (45,50))
+            sprite = pygame.transform.scale(sprite, (25, 25))
         self.components.append(sprite)
 
     def append_component(self, component):
@@ -41,11 +43,16 @@ class Window():
         self.speed -= 1
         if not self.speed:
             self.speed = -1
+        if self.frame > self.frames:
+            self.frame = self.frames
 
     def forward(self):
         self.speed += 1
         if not self.speed:
             self.speed = 1
+        if self.frame < 0:
+            self.frame = 0
+
 
     def handle_play(self):
         self.play = not self.play
