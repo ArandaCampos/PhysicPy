@@ -24,5 +24,3 @@ class Menu:
         for index, text in enumerate(texts):
             win.blit(self.images[index], (WIDTH - 150, 20 + 50 * index))
             win.blit(text, (WIDTH - 100, 25 + 50 * index))
-            
-            
