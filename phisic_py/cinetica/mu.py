@@ -68,8 +68,8 @@ class Objeto:
         return img
 
 class Game(Window):
-    def __init__(self, size, txt, font):
-        super().__init__(size, txt, font=font)
+    def __init__(self, size, txt):
+        super().__init__(size, txt)
         self.velocity = 1/20
         self.speed = 1
         self.frame = 0
@@ -131,5 +131,5 @@ class Game(Window):
         self.exit()
 
 if __name__ == '__main__':
-    game = Game((WIDTH, HEIGHT), "Movimento Uniforme", FONT)
+    game = Game((WIDTH, HEIGHT), "Movimento Uniforme")
     game.run()
