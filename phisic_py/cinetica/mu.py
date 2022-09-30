@@ -10,7 +10,7 @@ import pygame
 from base import Window, Menu
 
 HEIGHT, WIDTH = 600, 1200
-WHITE, BLACK = (210, 210, 210), (0, 0, 0, 0.8)
+WHITE, BLACK, GRAY = (210, 210, 210), (0, 0, 0, 0.8), (88, 88, 88)
 FONT = ('comicsans', 16)
 ABS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 IMG_PATH = os.path.join(ABS_PATH, 'sprites')
@@ -21,23 +21,26 @@ class Objeto:
         self.y = y
         self.pf = pf
         self.v = v
-        self.menu = Menu(('clock.png', 'pointer.png'))
-        self.diameter = 20
+        self.a = 0
+        self.menu = Menu(('clock.png', 'pointer.png', 'speedometer.png', 'accelaration.png'))
+        self.diameter = 15
 
         self.SCALEX = (WIDTH - 50 - self.diameter) / (pf - x)       # 10px == 1 metro
-        self.SCALEY = (HEIGHT - 50 - self.diameter) / 4
+        self.SCALEY = (HEIGHT - 70 - self.diameter) / 4
         self.font = pygame.font.SysFont('Arial', 12)
 
         self.movements = []
         self.position = 0
 
     def draw(self, win):
-        if len(self.movements) > 2:
-            pygame.draw.line(win, BLACK, self.transform(self.movements[0]), self.transform(self.movements[self.position]), 2)
+        if self.position > 1:
+            pygame.draw.line(win, GRAY, self.transform(self.movements[0]), self.transform(self.movements[self.position]), 2)
 
         pos = self.font.render('{:.1f} m'.format(self.movements[self.position][0]), True, BLACK)
         timer = self.font.render('{:.2f} s'.format(self.position/20), True, BLACK)
-        self.menu.draw(win, (pos, timer))
+        vel = self.font.render('{:.2f} Km/h'.format(self.v), True, BLACK)
+        a = self.font.render('{:.2f} m/s²'.format(self.a), True, BLACK)
+        self.menu.draw(win, (pos, timer, vel, a))
 
         pygame.draw.circle(win, BLACK, self.transform(self.movements[self.position]), self.diameter)
         
@@ -117,6 +120,10 @@ class Game(Window):
                         self.to_back()
                     if event.key == pygame.K_RIGHT:
                         self.forward()
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    print(pygame.mouse.get_pos())
+                    if self.menu.images[1].get_rect(center=((WIDTH - 12) / 2, HEIGHT - 38)).collidepoint(pygame.mouse.get_pos()) or self.menu.images[2].get_rect(center=((WIDTH - 25) / 2, HEIGHT - 50)).collidepoint(pygame.mouse.get_pos()):
+                        self.handle_play()
 
             if self.play:
                 self.frame += self.speed
