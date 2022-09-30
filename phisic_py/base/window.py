@@ -1,3 +1,4 @@
+from email.header import Header
 import pygame
 from .menu import Menu
 
@@ -18,6 +19,7 @@ class Window():
         self.bg = bg
         self.font = font
         self.components = []
+        self.font_title = pygame.font.SysFont('Arial', 20)
         self.font = pygame.font.SysFont('Arial', 12)
         self.menu = None
 
@@ -25,15 +27,21 @@ class Window():
 
     def init(self):
         self.screen = pygame.display.set_mode(self.size)
-        pygame.display.set_caption(self.title)
+        pygame.display.set_caption('PhyficPy')
+        self.write_title()
         self.menu = Menu(("go_back.png", 'pause.png', 'play.png'))
 
-
+    def write_title(self):
+        title = self.font_title.render('{}'.format(self.title), True, BLACK)
+        _, _, size, _ = title.get_rect()
+        self.screen.blit(title, ((WIDTH - size )/ 2 , 25))
+        
     def refresh_screen(self):
         self.screen.fill(self.bg)
         for component in self.components:
             component.draw(self.screen)
         self.menu_draw()
+        self.write_title()
         pygame.display.flip()
 
     def menu_draw(self):
