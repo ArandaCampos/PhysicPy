@@ -11,7 +11,6 @@ from base import Window, Menu
 
 HEIGHT, WIDTH = 600, 1200
 WHITE, BLACK, GRAY = (210, 210, 210), (0, 0, 0, 0.8), (88, 88, 88)
-FONT = ('comicsans', 16)
 ABS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 IMG_PATH = os.path.join(ABS_PATH, 'sprites')
 
