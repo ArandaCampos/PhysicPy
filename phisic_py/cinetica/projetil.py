@@ -10,13 +10,12 @@ import os
 from base import Window, Menu
 
 WIDTH, HEIGHT = 1200, 600
-WHITE, BLACK, GRAY = (210, 210, 210), (0, 0, 0, 0.8), (88, 88, 88)
+WHITE, BLACK, GRAY = (210, 210, 210), (0, 0, 0, 0.8), (108, 108, 108, .8)
 ABS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 IMG_PATH = os.path.join(ABS_PATH, 'sprites')
 
 class Objeto:
 	g = -9.807 		       	# Aceleração da gravidade (m/s^2)
-	ESCALA = 10				# 10px == 1 metro
 
 	def __init__(self, h, velocity, angle):
 		self.x = 0											# Posição Vertical (m)
@@ -32,6 +31,7 @@ class Objeto:
 		self.movements = []
 		self.velocities = []
 		self.position = 0
+		self.interval = 0
 		self.a = self.g
 		self.SCALE = 0
 
@@ -44,7 +44,7 @@ class Objeto:
 
 		pygame.draw.circle(win, BLACK, self.transform(self.movements[self.position]), self.diameter)
 
-		timer = self.font.render('{:.2f} s'.format(self.position/20), True, BLACK)
+		timer = self.font.render('{:.2f} s'.format(self.position * self.interval), True, BLACK)
 		posx = self.font.render('{:.1f} m (x)'.format(self.movements[self.position][0]), True, BLACK)
 		posy = self.font.render('{:.1f} m (y)'.format(self.movements[self.position][1]), True, BLACK)
 		velx = self.font.render('{:.2f} Km/h (x)'.format(self.velocities[self.position][0]), True, BLACK)
@@ -54,13 +54,14 @@ class Objeto:
 
 	def transform(self, position):
 		if not self.SCALE:
-			if self.angle <= 45 :
+			xmax =  self.movements[-1][0]
+			hmax = (math.pow(self.v, 2) * math.pow(math.sin(math.radians(self.angle)), 2)) / (-2 * self.g) + self.y
+			if xmax / WIDTH >= hmax / HEIGHT:
 				self.SCALE = (WIDTH - self.diameter - 50) / self.movements[-1][0]
 			else:
-				hmax = (math.pow(self.v, 2) * math.pow(math.sin(math.radians(self.angle)), 2)) / (-2 * self.g)
-				self.SCALE = (HEIGHT - self.diameter - 50) / hmax
+				self.SCALE = (HEIGHT - self.diameter - 150) / hmax
 		x, y = position
-		return (x * self.SCALE + 25, HEIGHT - y * self.SCALE - self.diameter)
+		return (x * self.SCALE + 25, HEIGHT - y * self.SCALE - self.diameter - 55)
 
 	def vel(self, t):
 		vx = self.vx * t
@@ -69,6 +70,7 @@ class Objeto:
 
 	def movement(self, interval):
 		x, y = self.x , self.y
+		self.interval = interval
 		time = 0
 		while y >= 0:
 			vx, vy = self.vel(time)
@@ -87,8 +89,8 @@ class Game(Window):
 	def __init__(self, size, title, font):
 		super().__init__(size, title)
 
-		self.velocity = 1/20
-		self.speed = 1
+		self.velocity = 1/80
+		self.speed = 2
 		self.frame = 0
 		self.frames = 0
 
@@ -119,7 +121,7 @@ class Game(Window):
 		self.append_component(obj)
 
 		while run:
-			clock.tick(20)
+			clock.tick(40)
 			self.refresh_screen()
 
 			for event in pygame.event.get():
@@ -134,6 +136,7 @@ class Game(Window):
 						self.forward()
 					if event.key == pygame.K_0 or event.key == pygame.K_KP0:
 						self.frame = 0
+						obj.update_position(self.frame)
 
 			if self.play:
 				self.frame += self.speed
