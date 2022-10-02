@@ -3,7 +3,7 @@ import pygame
 from .menu import Menu
 
 HEIGHT, WIDTH = 600, 1200
-WHITE, BLACK = (210, 210, 210), (0, 0, 0, 0.8)
+WHITE, BLACK, GRAY = (210, 210, 210), (0, 0, 0, 0.8),  (108, 108, 108)
 
 class Window():
     pygame.init()
@@ -32,7 +32,7 @@ class Window():
         self.menu = Menu(("go_back.png", 'pause.png', 'play.png'))
 
     def write_title(self):
-        title = self.font_title.render('{}'.format(self.title), True, BLACK)
+        title = self.font_title.render('{}'.format(self.title), True, GRAY)
         _, _, size, _ = title.get_rect()
         self.screen.blit(title, ((WIDTH - size )/ 2 , 25))
         
