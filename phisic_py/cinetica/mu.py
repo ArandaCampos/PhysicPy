@@ -70,8 +70,8 @@ class Objeto:
 class Game(Window):
     def __init__(self, size, txt):
         super().__init__(size, txt)
-        self.velocity = 1/20
-        self.speed = 1
+        self.velocity = 1/80
+        self.speed = 2
         self.frame = 0
         self.frames = 0
 
@@ -104,29 +104,16 @@ class Game(Window):
         self.frames = boll.movement(self.velocity)
         self.append_component(boll)
 
-        while run:
-            clock.tick(20)
+        while self.start:
+            clock.tick(40)
 
             self.refresh_screen()
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        self.handle_play()
-                    if event.key == pygame.K_LEFT:
-                        self.to_back()
-                    if event.key == pygame.K_RIGHT:
-                        self.forward()
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    print(pygame.mouse.get_pos())
-                    if self.menu.images[1].get_rect(center=((WIDTH - 12) / 2, HEIGHT - 38)).collidepoint(pygame.mouse.get_pos()) or self.menu.images[2].get_rect(center=((WIDTH - 25) / 2, HEIGHT - 50)).collidepoint(pygame.mouse.get_pos()):
-                        self.handle_play()
+            self.get_event()
 
             if self.play:
                 self.frame += self.speed
-                boll.update_position(self.frame)
+            
+            boll.update_position(self.frame)
 
         self.exit()
 

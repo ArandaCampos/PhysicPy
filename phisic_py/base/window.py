@@ -24,6 +24,7 @@ class Window():
         self.menu = None
 
         self.play = True
+        self.start = True
 
     def init(self):
         self.screen = pygame.display.set_mode(self.size)
@@ -44,14 +45,32 @@ class Window():
         self.write_title()
         pygame.display.flip()
 
+    def get_event(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.start = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.handle_play()
+                if event.key == pygame.K_LEFT:
+                    self.to_back()
+                if event.key == pygame.K_RIGHT:
+                    self.forward()
+                if event.key == pygame.K_0 or event.key == pygame.K_KP0:
+                    self.frame = 0
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if self.menu.images[1].get_rect(center=((WIDTH - 12) / 2, HEIGHT - 38)).collidepoint(pygame.mouse.get_pos()) or self.menu.images[2].get_rect(center=((WIDTH - 25) / 2, HEIGHT - 50)).collidepoint(pygame.mouse.get_pos()):
+                    self.handle_play()
+
+
     def menu_draw(self):
         if self.speed > 0:
             progress_img = pygame.transform.rotate(self.menu.images[0], 180)
-            speed = self.speed
+            speed = self.speed / 2
             pos_img, pos_txt = ((WIDTH - 25) * 0.4, HEIGHT - 50), ((WIDTH - 25) * 0.43 , HEIGHT - 45)
         else:
             progress_img = self.menu.images[0]
-            speed = - self.speed 
+            speed = - self.speed / 2
             pos_img, pos_txt = ((WIDTH - 25) * 0.6, HEIGHT - 50), ((WIDTH - 25) * 0.57, HEIGHT - 45)
         status = (self.menu.images[2] if self.play else self.menu.images[1])
         

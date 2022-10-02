@@ -120,27 +120,14 @@ class Game(Window):
 		self.frames = obj.movement(self.velocity)
 		self.append_component(obj)
 
-		while run:
+		while self.start:
 			clock.tick(40)
 			self.refresh_screen()
-
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					run = False
-				elif event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_SPACE:
-						self.handle_play()
-					if event.key == pygame.K_LEFT:
-						self.to_back()
-					if event.key == pygame.K_RIGHT:
-						self.forward()
-					if event.key == pygame.K_0 or event.key == pygame.K_KP0:
-						self.frame = 0
-						obj.update_position(self.frame)
-
+			self.get_event()
+			
 			if self.play:
 				self.frame += self.speed
-				obj.update_position(self.frame)
+			obj.update_position(self.frame)
 
 		self.exit()
 

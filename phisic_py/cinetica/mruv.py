@@ -76,8 +76,8 @@ class Game(Window):
     def __init__(self, size, title, font):
         super().__init__(size, title)
 
-        self.velocity = 1/20
-        self.speed = 1
+        self.velocity = 1/80
+        self.speed = 2
         self.frame = 0
         self.frames = 0
 
@@ -112,24 +112,14 @@ class Game(Window):
         self.frames = obj.movement(self.velocity)
         self.append_component(obj)
 
-        while run:
-            clock.tick(20)
+        while self.start:
+            clock.tick(40)
             self.refresh_screen()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        self.handle_play()
-                    if event.key == pygame.K_LEFT:
-                        self.to_back()
-                    if event.key == pygame.K_RIGHT:
-                        self.forward()
-
+            self.get_event()
+            
             if self.play:
                 self.frame += self.speed
-                obj.update_position(self.frame)
+            obj.update_position(self.frame)
 
         self.exit()
 
