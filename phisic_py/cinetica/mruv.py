@@ -76,11 +76,6 @@ class Game(Window):
     def __init__(self, size, title, font):
         super().__init__(size, title)
 
-        self.velocity = 1/80
-        self.speed = 2
-        self.frame = 0
-        self.frames = 0
-
     def run(self):
         run = True
         clock = pygame.time.Clock()
@@ -116,7 +111,7 @@ class Game(Window):
             clock.tick(40)
             self.refresh_screen()
             self.get_event()
-            
+
             if self.play:
                 self.frame += self.speed
             obj.update_position(self.frame)

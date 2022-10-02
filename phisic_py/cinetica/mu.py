@@ -70,10 +70,6 @@ class Objeto:
 class Game(Window):
     def __init__(self, size, txt):
         super().__init__(size, txt)
-        self.velocity = 1/80
-        self.speed = 2
-        self.frame = 0
-        self.frames = 0
 
     def run(self):
         clock = pygame.time.Clock()

@@ -57,6 +57,7 @@ class Objeto:
             y = math.sqrt(math.pow(self.L, 2) - math.pow(x, 2))
             time += interval
             self.movements.append((x, y))
+        return len(self.movements)
 
     def update_position(self, frame):
         if frame < len(self.movements) and frame >= 0:
@@ -65,11 +66,7 @@ class Objeto:
 class Game(Window):
     def __init__(self, size, txt, font):
         super().__init__(size, txt)
-
-        self.velocity = 1/80
-        self.speed = 2
-        self.frame = 0
-
+        
     def run(self):
         clock = pygame.time.Clock()
         run = True
@@ -94,7 +91,7 @@ class Game(Window):
         self.init()
 
         obj = Objeto(theta, m, L)
-        obj.movement(self.velocity)
+        self.frames = obj.movement(self.velocity)
         self.append_component(obj)
 
         while run:

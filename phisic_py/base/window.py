@@ -10,14 +10,12 @@ class Window():
     def __init__(self,
                  size: (int, int),
                  title: str,
-                 bg: (int, int, int) = (210, 210, 210),
-                 font: (str, int) = (None, 32)
+                 bg: (int, int, int) = (210, 210, 210)
                  ):
         self.size = size
         self.title = title
         self.screen = None
         self.bg = bg
-        self.font = font
         self.components = []
         self.font_title = pygame.font.SysFont('Arial', 20)
         self.font = pygame.font.SysFont('Arial', 12)
@@ -25,6 +23,11 @@ class Window():
 
         self.play = True
         self.start = True
+        self.velocity = 1/80
+        self.speed = 2
+        self.frame = 0
+        self.frames = 0
+
 
     def init(self):
         self.screen = pygame.display.set_mode(self.size)

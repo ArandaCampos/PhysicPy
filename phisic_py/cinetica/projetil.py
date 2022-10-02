@@ -89,10 +89,6 @@ class Game(Window):
 	def __init__(self, size, title, font):
 		super().__init__(size, title)
 
-		self.velocity = 1/80
-		self.speed = 2
-		self.frame = 0
-		self.frames = 0
 
 	def run(self):
 		run = True
