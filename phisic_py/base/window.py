@@ -28,7 +28,6 @@ class Window():
         self.frame = 0
         self.frames = 0
 
-
     def init(self):
         self.screen = pygame.display.set_mode(self.size)
         pygame.display.set_caption('PhyficPy')

@@ -4,7 +4,7 @@ import os
 ABS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 IMG_PATH = os.path.join(ABS_PATH, 'sprites')
 HEIGHT, WIDTH = 600, 1200
-WHITE, BLACK = (210, 210, 210), (0, 0, 0, 0.8)
+WHITE, BLACK, GRAY = (210, 210, 210), (0, 0, 0, 0.8), (108, 108, 108)
 
 class Menu:
     def __init__(self, imgs):
