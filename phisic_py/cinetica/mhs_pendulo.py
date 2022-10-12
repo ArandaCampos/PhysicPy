@@ -3,6 +3,7 @@
 #   Github: github.com/ArandaCampos
 #   Movimento Harmônica Simples (MHS)
 #----------------------------------------
+
 import math
 import pygame
 from base import Window
@@ -57,6 +58,7 @@ class Objeto:
             y = math.sqrt(math.pow(self.L, 2) - math.pow(x, 2))
             time += interval
             self.movements.append((x, y))
+        return len(self.movements)
 
     def update_position(self, frame):
         if frame < len(self.movements) and frame >= 0:
@@ -65,10 +67,6 @@ class Objeto:
 class Game(Window):
     def __init__(self, size, txt, font):
         super().__init__(size, txt)
-
-        self.velocity = 1/20
-        self.speed = 1
-        self.frame = 0
 
     def run(self):
         clock = pygame.time.Clock()
@@ -94,27 +92,19 @@ class Game(Window):
         self.init()
 
         obj = Objeto(theta, m, L)
-        obj.movement(self.velocity)
+        self.frames = obj.movement(self.velocity)
         self.append_component(obj)
 
-        while run:
-            clock.tick(20)
-            self.refresh_screen()
+        while self.start:
+            clock.tick(40)
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        self.handle_play()
-                    if event.key == pygame.K_LEFT:
-                        self.to_back()
-                    if event.key == pygame.K_RIGHT:
-                        self.forward()
+            self.refresh_screen()
+            self.get_event()
 
             if self.play:
                 self.frame += self.speed
-                obj.update_position(self.frame)
+
+            obj.update_position(self.frame)
 
         self.exit()
 
