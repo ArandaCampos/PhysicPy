@@ -5,7 +5,7 @@
 &emsp;O projeto propõe experimentos virtuais dos conteúdos de Física do ensino médio. Inicialmente, o <strong>PhysicsPy</strong> contará com experimentos ligados à cinética básica. Posteriormente, o projeto almeja outros conceitos como termodinâmica, mecânica dos flúidos, astronomia e eletricidade<br>
 
 
-![ezgif com-gif-maker(1)](https://user-images.githubusercontent.com/87876734/160255420-d82d703b-05db-434e-8f76-21b042faf776.gif)
+![ezgif com-gif-maker (2)](https://user-images.githubusercontent.com/87876734/195373832-e80e62f8-9486-4ca7-b9de-baa626b715b6.gif)
 
 ## Tecnologias Empregadas
 
